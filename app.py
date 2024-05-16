@@ -43,7 +43,7 @@ def generate_personalized_advice(university, course, marks):
         )
         openai_api_key = os.getenv("OPENAI_API_KEY")
         headers = {
-            "Authorization": f"Bearer {openai_api_key}",
+            "Authorization": f"Bearer {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}",
             "Content-Type": "application/json"
         }
         data = {
