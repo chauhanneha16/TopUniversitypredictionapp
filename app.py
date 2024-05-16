@@ -5,7 +5,6 @@ import pickle
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import seaborn as sns
-import requests
 
 # Set the page config
 st.set_page_config(page_title="University Recommendation System", page_icon="🎓", layout="wide")
@@ -31,32 +30,39 @@ def load_model_and_preprocessors():
 
 model, scaler, label_encoder_course, label_encoder_uni = load_model_and_preprocessors()
 
-# Function to generate personalized advice using OpenAI API
+# Function to generate personalized advice without OpenAI
 def generate_personalized_advice(university, course, marks):
-    try:
-        prompt = (
-            f"Student's Marks: {marks}\n"
-            f"Recommended University: {university}\n"
-            f"Recommended Course: {course}\n"
-            f"Provide personalized advice for the student to improve their chances of admission."
-        )
-        openai_api_key = st.secrets["openai"]["api_key"]
-        headers = {
-            "Authorization": f"Bearer {openai_api_key}",
-            "Content-Type": "application/json"
-        }
-        data = {
-            "model": "text-davinci-003",
-            "prompt": prompt,
-            "max_tokens": 100
-        }
-        response = requests.post("https://api.openai.com/v1/completions", headers=headers, json=data)
-        response.raise_for_status()
-        result = response.json()
-        return result["choices"][0]["text"].strip()
-    except Exception as e:
-        st.error(f"An error occurred while generating personalized advice: {e}")
-        return "Advice generation failed."
+    advice = []
+
+    if marks['Science'] < 50:
+        advice.append("Focus on improving your Science marks.")
+    if marks['Maths'] < 50:
+        advice.append("Focus on improving your Maths marks.")
+    if marks['History'] < 50:
+        advice.append("Focus on improving your History marks.")
+    if marks['English'] < 50:
+        advice.append("Focus on improving your English marks.")
+    if marks['GRE'] < 300:
+        advice.append("Consider retaking the GRE to improve your score.")
+
+    if course == "Engineering":
+        advice.append("Enhance your programming skills by taking online courses.")
+    elif course == "Computer Science":
+        advice.append("Work on projects and internships related to software development.")
+    elif course == "Physics":
+        advice.append("Participate in research projects and science fairs.")
+    elif course == "History":
+        advice.append("Read extensively and engage in historical research projects.")
+    elif course == "Chemistry":
+        advice.append("Gain hands-on experience in laboratories and participate in chemistry competitions.")
+    elif course == "MBBS":
+        advice.append("Gain practical experience by volunteering at clinics or hospitals.")
+    elif course == "Literature":
+        advice.append("Engage in extensive reading and writing practice.")
+    elif course == "Business Administration":
+        advice.append("Develop leadership and management skills through relevant courses and activities.")
+
+    return advice
 
 # Function to predict the university, recommended course, and advice based on input marks
 def predict_university_and_advice(science_marks, maths_marks, history_marks, english_marks, gre_marks):
@@ -117,7 +123,8 @@ if st.sidebar.button('Submit'):
         st.write(f"### Academic Fee: **{fee}**")
         
         st.write("### Personal Advice:")
-        st.write(advice)
+        for item in advice:
+            st.write(f"- {item}")
         
         st.write("### Your Marks Overview")
         marks = {
@@ -138,6 +145,7 @@ This app provides university and course recommendations based on your academic m
 """)
 
 st.image("top-10-universities-in-the-world.png", caption="Achieve Your Academic Goals!", use_column_width=True)
+
 
 
 
