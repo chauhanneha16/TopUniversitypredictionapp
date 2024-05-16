@@ -6,18 +6,28 @@ from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import seaborn as sns
 import openai
+import os
 
 # Load the expanded dataset
-df = pd.read_csv("university_data.csv")
+@st.cache_data
+def load_data():
+    return pd.read_csv("university_data.csv")
+
+df = load_data()
 
 # Load the trained model and preprocessors
-model = load_model('university_recommendation_model.h5')
-with open('scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
-with open('label_encoder_course.pkl', 'rb') as f:
-    label_encoder_course = pickle.load(f)
-with open('label_encoder_uni.pkl', 'rb') as f:
-    label_encoder_uni = pickle.load(f)
+@st.cache_resource
+def load_model_and_preprocessors():
+    model = load_model('university_recommendation_model.h5')
+    with open('scaler.pkl', 'rb') as f:
+        scaler = pickle.load(f)
+    with open('label_encoder_course.pkl', 'rb') as f:
+        label_encoder_course = pickle.load(f)
+    with open('label_encoder_uni.pkl', 'rb') as f:
+        label_encoder_uni = pickle.load(f)
+    return model, scaler, label_encoder_course, label_encoder_uni
+
+model, scaler, label_encoder_course, label_encoder_uni = load_model_and_preprocessors()
 
 # Function to generate personalized advice using OpenAI API
 def generate_personalized_advice(university, course, marks):
@@ -27,7 +37,7 @@ def generate_personalized_advice(university, course, marks):
         f"Recommended Course: {course}\n"
         f"Provide personalized advice for the student to improve their chances of admission."
     )
-    openai.api_key = "sk-proj-TPwk1TAe5S1CuyALktrTT3BlbkFJvtTKgEILONrmeHOXKFJK"
+    openai.api_key = os.getenv("sk-proj-TPwk1TAe5S1CuyALktrTT3BlbkFJvtTKgEILONrmeHOXKFJK")
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
@@ -44,22 +54,26 @@ def predict_university_and_advice(science_marks, maths_marks, history_marks, eng
         predicted_uni_index = np.argmax(prediction)
         predicted_uni = label_encoder_uni.inverse_transform([predicted_uni_index])[0]
 
-        university_info = df[df['University Name'] == predicted_uni].iloc[0]
-        university_link = university_info['University Link']
-        scholarship_info = university_info['Scholarship Info']
-        academic_fee = university_info['Academic Fee']
-        recommended_course = label_encoder_course.inverse_transform([university_info['Course']])[0]
+        if predicted_uni in df['University Name'].values:
+            university_info = df[df['University Name'] == predicted_uni].iloc[0]
+            university_link = university_info['University Link']
+            scholarship_info = university_info['Scholarship Info']
+            academic_fee = university_info['Academic Fee']
+            recommended_course = label_encoder_course.inverse_transform([university_info['Course']])[0]
 
-        marks = {
-            "Science": science_marks,
-            "Maths": maths_marks,
-            "History": history_marks,
-            "English": english_marks,
-            "GRE": gre_marks
-        }
-        personalized_advice = generate_personalized_advice(predicted_uni, recommended_course, marks)
+            marks = {
+                "Science": science_marks,
+                "Maths": maths_marks,
+                "History": history_marks,
+                "English": english_marks,
+                "GRE": gre_marks
+            }
+            personalized_advice = generate_personalized_advice(predicted_uni, recommended_course, marks)
 
-        return predicted_uni, university_link, scholarship_info, academic_fee, recommended_course, personalized_advice
+            return predicted_uni, university_link, scholarship_info, academic_fee, recommended_course, personalized_advice
+        else:
+            st.error(f"Predicted university '{predicted_uni}' not found in the dataset.")
+            return None, None, None, None, None, None
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return None, None, None, None, None, None
