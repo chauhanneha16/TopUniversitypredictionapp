@@ -32,7 +32,7 @@ def predict_university_and_advice(science_marks, maths_marks, history_marks, eng
         university_link = university_info['University Link']
         scholarship_info = university_info['Scholarship Info']
         academic_fee = university_info['Academic Fee']
-        recommended_course = university_info['Course']
+        recommended_course = label_encoder_course.inverse_transform([university_info['Course']])[0]
 
         # Personalized advice
         advice = []
@@ -123,4 +123,5 @@ This app provides university and course recommendations based on your academic m
 """)
 
 # Display a university-related image
-st.image("https://example.com/university_image.jpg", caption="Achieve Your Academic Goals!", use_column_width=True)
+st.image("top-10-universities-in-the-world.png", caption="Achieve Your Academic Goals!", use_column_width=True)
+
