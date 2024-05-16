@@ -40,13 +40,17 @@ def generate_personalized_advice(university, course, marks):
         f"Recommended Course: {course}\n"
         f"Provide personalized advice for the student to improve their chances of admission."
     )
-    openai.api_key = os.getenv("sk-proj-bIvlztag8PWZy4vFfFboT3BlbkFJTEoXW1xvSIwDyi0wSCrT")
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=100
-    )
-    return response.choices[0].text.strip()
+    openai.api_key = os.getenv("sk-proj-5kBgv0UC2DpsPZBNVXlcT3BlbkFJKrXGTqZT2cqassDWc2Zh")
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=100
+        )
+        return response.choices[0].text.strip()
+    except Exception as e:
+        st.error(f"An error occurred while generating personalized advice: {e}")
+        return "Advice generation failed."
 
 # Function to predict the university, recommended course, and advice based on input marks
 def predict_university_and_advice(science_marks, maths_marks, history_marks, english_marks, gre_marks):
@@ -62,7 +66,7 @@ def predict_university_and_advice(science_marks, maths_marks, history_marks, eng
             university_link = university_info['University Link']
             scholarship_info = university_info['Scholarship Info']
             academic_fee = university_info['Academic Fee']
-            recommended_course = label_encoder_course.inverse_transform([university_info['Course']])[0]
+            recommended_course = university_info['Course']
 
             marks = {
                 "Science": science_marks,
@@ -78,7 +82,7 @@ def predict_university_and_advice(science_marks, maths_marks, history_marks, eng
             st.error(f"Predicted university '{predicted_uni}' not found in the dataset.")
             return None, None, None, None, None, None
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"An error occurred during prediction: {e}")
         return None, None, None, None, None, None
 
 st.title('University Recommendation System')
