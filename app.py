@@ -5,7 +5,7 @@ import pickle
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import seaborn as sns
-import openai
+import requests
 import os
 
 # Set the page config
@@ -34,20 +34,27 @@ model, scaler, label_encoder_course, label_encoder_uni = load_model_and_preproce
 
 # Function to generate personalized advice using OpenAI API
 def generate_personalized_advice(university, course, marks):
-    prompt = (
-        f"Student's Marks: {marks}\n"
-        f"Recommended University: {university}\n"
-        f"Recommended Course: {course}\n"
-        f"Provide personalized advice for the student to improve their chances of admission."
-    )
-    openai.api_key = os.getenv("sk-proj-5kBgv0UC2DpsPZBNVXlcT3BlbkFJKrXGTqZT2cqassDWc2Zh")
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=100
+        prompt = (
+            f"Student's Marks: {marks}\n"
+            f"Recommended University: {university}\n"
+            f"Recommended Course: {course}\n"
+            f"Provide personalized advice for the student to improve their chances of admission."
         )
-        return response.choices[0].text.strip()
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        headers = {
+            "Authorization": f"Bearer {openai_api_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "text-davinci-003",
+            "prompt": prompt,
+            "max_tokens": 100
+        }
+        response = requests.post("https://api.openai.com/v1/completions", headers=headers, json=data)
+        response.raise_for_status()
+        result = response.json()
+        return result["choices"][0]["text"].strip()
     except Exception as e:
         st.error(f"An error occurred while generating personalized advice: {e}")
         return "Advice generation failed."
