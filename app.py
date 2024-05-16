@@ -6,7 +6,6 @@ from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import seaborn as sns
 import requests
-import os
 
 # Set the page config
 st.set_page_config(page_title="University Recommendation System", page_icon="🎓", layout="wide")
@@ -41,9 +40,9 @@ def generate_personalized_advice(university, course, marks):
             f"Recommended Course: {course}\n"
             f"Provide personalized advice for the student to improve their chances of admission."
         )
-        openai_api_key = os.getenv("OPENAI_API_KEY")
+        openai_api_key = st.secrets["openai"]["api_key"]
         headers = {
-            "Authorization": f"Bearer {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}",
+            "Authorization": f"Bearer {openai_api_key}",
             "Content-Type": "application/json"
         }
         data = {
