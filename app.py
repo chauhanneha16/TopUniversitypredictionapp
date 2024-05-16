@@ -8,15 +8,15 @@ import seaborn as sns
 import openai  # Assuming you are using OpenAI's GPT-3/4
 
 # Load the expanded dataset
-df = pd.read_csv("/content/university_data.csv")
+df = pd.read_csv("university_data.csv")
 
 # Load the trained model and preprocessors
-model = load_model('/content/university_recommendation_model.h5')
-with open('/content/scaler.pkl', 'rb') as f:
+model = load_model('university_recommendation_model.h5')
+with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
-with open('/content/label_encoder_course.pkl', 'rb') as f:
+with open('label_encoder_course.pkl', 'rb') as f:
     label_encoder_course = pickle.load(f)
-with open('/content/label_encoder_uni.pkl', 'rb') as f:
+with open('label_encoder_uni.pkl', 'rb') as f:
     label_encoder_uni = pickle.load(f)
 
 # Function to generate personalized advice using OpenAI API
