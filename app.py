@@ -40,7 +40,7 @@ def generate_personalized_advice(university, course, marks):
         f"Recommended Course: {course}\n"
         f"Provide personalized advice for the student to improve their chances of admission."
     )
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    openai.api_key = os.getenv("sk-proj-bIvlztag8PWZy4vFfFboT3BlbkFJTEoXW1xvSIwDyi0wSCrT")
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
