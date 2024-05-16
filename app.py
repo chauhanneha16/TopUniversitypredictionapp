@@ -1,4 +1,3 @@
-
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -8,15 +7,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the expanded dataset
-df = pd.read_csv("university_data.csv")
+df = pd.read_csv("/content/university_data.csv")
 
 # Load the trained model and preprocessors
-model = load_model('university_recommendation_model.h5')
-with open('scaler.pkl', 'rb') as f:
+model = load_model('/content/university_recommendation_model.h5')
+with open('/content/scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
-with open('label_encoder_course.pkl', 'rb') as f:
+with open('/content/label_encoder_course.pkl', 'rb') as f:
     label_encoder_course = pickle.load(f)
-with open('label_encoder_uni.pkl', 'rb') as f:
+with open('/content/label_encoder_uni.pkl', 'rb') as f:
     label_encoder_uni = pickle.load(f)
 
 # Function to predict the university, recommended course, and advice based on input marks
