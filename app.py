@@ -8,6 +8,9 @@ import seaborn as sns
 import openai
 import os
 
+# Set the page config
+st.set_page_config(page_title="University Recommendation System", page_icon="🎓", layout="wide")
+
 # Load the expanded dataset
 @st.cache_data
 def load_data():
@@ -37,7 +40,7 @@ def generate_personalized_advice(university, course, marks):
         f"Recommended Course: {course}\n"
         f"Provide personalized advice for the student to improve their chances of admission."
     )
-    openai.api_key = os.getenv("sk-proj-TPwk1TAe5S1CuyALktrTT3BlbkFJvtTKgEILONrmeHOXKFJK")
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
@@ -77,9 +80,6 @@ def predict_university_and_advice(science_marks, maths_marks, history_marks, eng
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return None, None, None, None, None, None
-
-# Streamlit app layout
-st.set_page_config(page_title="University Recommendation System", page_icon="🎓", layout="wide")
 
 st.title('University Recommendation System')
 st.subheader('Advisor: Dr. Neha Chauhan')
@@ -128,5 +128,6 @@ This app provides university and course recommendations based on your academic m
 """)
 
 st.image("top-10-universities-in-the-world.png", caption="Achieve Your Academic Goals!", use_column_width=True)
+
 
 
